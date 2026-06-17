@@ -405,7 +405,42 @@ const commands = [
                 .setDescription('Mostra o lucro de hoje')
         )
 
+    ,
+    new SlashCommandBuilder()
+        .setName('health')
+        .setDescription('Mostra o status atual do bot (uptime, memória, DB)')
+
 ].map(command => command.toJSON());
+
+// Auto-register any command modules present in /commands that aren't in the static list
+const fs = require('fs');
+const path = require('path');
+const commandsDir = path.join(__dirname, 'commands');
+try {
+    if (fs.existsSync(commandsDir)) {
+        const files = fs.readdirSync(commandsDir).filter(f => f.endsWith('.js'));
+        for (const file of files) {
+            const name = path.basename(file, '.js');
+            if (!commands.some(c => c.name === name || c.name?.toString?.() === name)) {
+                // Try to load module and use exported `definition` if present
+                try {
+                    const mod = require(path.join(commandsDir, file));
+                    if (mod && mod.definition && typeof mod.definition.toJSON === 'function') {
+                        commands.push(mod.definition.toJSON());
+                        continue;
+                    }
+                } catch (err) {
+                    // ignore module load errors and fall back to minimal registration
+                }
+
+                // add a minimal registration for this command
+                commands.push(new SlashCommandBuilder().setName(name).setDescription(`Auto-registered: ${name}`).toJSON());
+            }
+        }
+    }
+} catch (err) {
+    console.error('Erro ao ler comandos dinâmicos:', err);
+}
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 

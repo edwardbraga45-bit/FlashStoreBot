@@ -21,6 +21,9 @@ const {
 const config = require('./config');
 const utils = require('./utils');
 const Features = require('./features');
+const Cache = require('./lib/cache');
+const RateLimiter = require('./lib/rateLimiter');
+const AuditLog = require('./lib/auditLog');
 
 
 const client = new Client({
@@ -307,6 +310,11 @@ fs.watchFile(DATA_FILE, { interval: 1000 }, (curr, prev) => {
 let db = loadDB();
 let needsSave = false;
 
+// Inicializar helpers: cache, rate limiter e audit log
+const cache = new Cache();
+const rateLimiter = new RateLimiter({ windowMs: 10000, max: 5 });
+const auditLog = new AuditLog(path.join(__dirname, 'logs', 'audit.log'));
+
 // Sincronizar todos os preços com os valores corretos
 for (const produto of Object.values(PRODUTOS)) {
     const key = normalizeName(produto.nome);
@@ -514,13 +522,90 @@ client.on(Events.InteractionCreate, async interaction => {
         }
         if (!interaction.inGuild()) return;
 
+        // Rate limit para comandos do tipo chat input
+        if (interaction.isChatInputCommand()) {
+            // Tenta carregar módulo de comando em ./commands/<name>.js
+            const cmdPath = path.join(__dirname, 'commands', `${interaction.commandName}.js`);
+            if (fs.existsSync(cmdPath)) {
+                try {
+                    delete require.cache[require.resolve(cmdPath)];
+                    const mod = require(cmdPath);
+                    if (mod && typeof mod.execute === 'function') {
+                        await mod.execute(interaction, { 
+                            client,
+                            db,
+                            utils,
+                            cache,
+                            auditLog,
+                            rateLimiter,
+                            Features,
+                            sendLog,
+                            sendRestockNotification,
+                            saveDB,
+                            ensureStockItem,
+                            normalizeName,
+                            buildStats,
+                            PRODUTOS,
+                            SUPORTE_ROLE_ID,
+                            CARGO_EXTRA_1_ID,
+                            CARGO_EXTRA_2_ID,
+                            CANAL_REGRAS_ID,
+                            CANAL_TERMOS_ID,
+                            CANAL_AVALIACOES_ID
+                        });
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Erro ao executar módulo de comando:', err);
+                }
+            }
+            const rl = rateLimiter.isAllowed(interaction.user.id);
+            if (!rl.allowed) {
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({ content: '❌ Você está executando comandos rápido demais. Aguarde alguns segundos.', ephemeral: true });
+                }
+                return;
+            }
+            rateLimiter.record(interaction.user.id);
+        }
+
         if (interaction.isChatInputCommand()) {
             if (interaction.commandName === 'painel') {
-                const botao = new ActionRowBuilder().addComponents(
-                    new ButtonBuilder()
-                        .setCustomId('criar_ticket')
-                        .setLabel('🎫 Abrir Ticket')
-                        .setStyle(ButtonStyle.Primary)
+                            if (interaction.commandName === 'health') {
+                                const uptime = process.uptime();
+                                const memory = process.memoryUsage();
+                                const dbStatus = (db && Object.keys(db).length > 0) ? 'loaded' : 'empty';
+
+                                const healthEmbed = new EmbedBuilder()
+                                    .setColor('#22C55E')
+                                    .setTitle('🩺 Health — Flash Store Bot')
+                                    .addFields(
+                                        { name: 'Uptime', value: `${Math.floor(uptime)}s`, inline: true },
+                                        { name: 'Memory (RSS)', value: `${Math.round(memory.rss / 1024 / 1024)} MB`, inline: true },
+                                        { name: 'DB', value: dbStatus, inline: true }
+                                    )
+                                    .setTimestamp();
+
+                                return interaction.reply({ embeds: [healthEmbed], ephemeral: true });
+                            }
+                const tipoMenu = new ActionRowBuilder().addComponents(
+                    new StringSelectMenuBuilder()
+                        .setCustomId('tipo_ticket')
+                        .setPlaceholder('Escolha o tipo de atendimento')
+                        .addOptions([
+                            {
+                                label: 'Receber produto',
+                                value: 'receber_produto',
+                                description: 'Abrir ticket para confirmar entrega ou envio de pedido',
+                                emoji: '📦'
+                            },
+                            {
+                                label: 'Suporte',
+                                value: 'suporte',
+                                description: 'Abrir ticket para dúvidas, problemas ou ajuda técnica',
+                                emoji: '🛠️'
+                            }
+                        ])
                 );
 
                 const embed = new EmbedBuilder()
@@ -529,7 +614,10 @@ client.on(Events.InteractionCreate, async interaction => {
                     .setDescription(`
 🎫 **Seja bem-vindo ao sistema de tickets da Flash Store!**
 
-Abra um ticket para realizar compras, solicitar suporte, tirar dúvidas, acompanhar pedidos ou receber atendimento da nossa equipe.
+Escolha uma das opções abaixo para abrir seu atendimento:
+
+• **Receber produto** — envie o comprovante e acompanhe seu pedido.
+• **Suporte** — tire dúvidas, reporte problemas ou solicite ajuda técnica.
 
 📌 **Antes de abrir um ticket:**
 • Explique sua solicitação de forma clara e detalhada;
@@ -550,7 +638,7 @@ Abra um ticket para realizar compras, solicitar suporte, tirar dúvidas, acompan
 
                 return interaction.reply({
                     embeds: [embed],
-                    components: [botao]
+                    components: [tipoMenu]
                 });
             }
 
@@ -628,6 +716,11 @@ Abra um ticket para realizar compras, solicitar suporte, tirar dúvidas, acompan
 
                     saveDB();
 
+                    // Audit log
+                    try {
+                        auditLog.logAction('estoque_adicionar', interaction.user.tag, { produto, quantidade, total: item.quantidade });
+                    } catch (e) { /* noop */ }
+
                     void sendRestockNotification(`✅ Estoque reabastecido para **${produto}**: **${item.quantidade}** unidades.`);
 
                     return interaction.editReply(
@@ -654,6 +747,11 @@ Abra um ticket para realizar compras, solicitar suporte, tirar dúvidas, acompan
 
                     db.stock[key].quantidade -= quantidade;
                     saveDB();
+
+                    // Audit log
+                    try {
+                        auditLog.logAction('estoque_remover', interaction.user.tag, { produto, quantidade, total: db.stock[key].quantidade });
+                    } catch (e) { /* noop */ }
 
                     void sendLog(
                         '📦 Estoque ajustado',
@@ -785,6 +883,11 @@ Abra um ticket para realizar compras, solicitar suporte, tirar dúvidas, acompan
                     }
                     
                     saveDB();
+
+                    // Audit log de venda
+                    try {
+                        auditLog.logAction('venda_registrada', interaction.user.tag, { cliente, produto, valor, custo, quantidade, lucro });
+                    } catch (e) { /* noop */ }
 
                     void sendLog(
                         '💰 Nova venda registrada',
@@ -1025,24 +1128,32 @@ Escolha o pacote desejado usando o menu abaixo.
             }
             if (interaction.commandName === 'stats') {
                 await interaction.deferReply({ ephemeral: true });
-                const stats = buildStats();
 
-                const embed = new EmbedBuilder()
-                    .setColor('#8A2BE2')
-                    .setTitle('📊 Stats da Flash Store')
-                    .setDescription('Resumo geral da operação da loja.')
-                    .addFields(
-                        { name: 'Vendas', value: String(stats.vendas), inline: true },
-                        { name: 'Receita', value: `R$ ${stats.receita.toFixed(2)}`, inline: true },
-                        { name: 'Lucro', value: `R$ ${stats.lucro.toFixed(2)}`, inline: true },
-                        { name: 'Produtos', value: String(stats.produtos), inline: true },
-                        { name: 'Estoque total', value: String(stats.estoqueTotal), inline: true },
-                        { name: 'Cupons ativos', value: String(stats.couponsAtivos), inline: true },
-                        { name: 'Tickets', value: String(stats.tickets), inline: true },
-                        { name: 'Estoque baixo', value: String(stats.estoqueBaixo), inline: true },
-                        { name: 'Top produto', value: stats.topProduto, inline: true }
-                    )
-                    .setFooter({ text: 'Flash Store • Monitoramento' });
+                const cacheKey = 'stats_overview';
+                let embed = cache.get(cacheKey);
+
+                if (!embed) {
+                    const stats = buildStats();
+
+                    embed = new EmbedBuilder()
+                        .setColor('#8A2BE2')
+                        .setTitle('📊 Stats da Flash Store')
+                        .setDescription('Resumo geral da operação da loja.')
+                        .addFields(
+                            { name: 'Vendas', value: String(stats.vendas), inline: true },
+                            { name: 'Receita', value: `R$ ${stats.receita.toFixed(2)}`, inline: true },
+                            { name: 'Lucro', value: `R$ ${stats.lucro.toFixed(2)}`, inline: true },
+                            { name: 'Produtos', value: String(stats.produtos), inline: true },
+                            { name: 'Estoque total', value: String(stats.estoqueTotal), inline: true },
+                            { name: 'Cupons ativos', value: String(stats.couponsAtivos), inline: true },
+                            { name: 'Tickets', value: String(stats.tickets), inline: true },
+                            { name: 'Estoque baixo', value: String(stats.estoqueBaixo), inline: true },
+                            { name: 'Top produto', value: stats.topProduto, inline: true }
+                        )
+                        .setFooter({ text: 'Flash Store • Monitoramento' });
+
+                    cache.set(cacheKey, embed, 5000);
+                }
 
                 return interaction.editReply({ embeds: [embed] });
             }
