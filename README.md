@@ -1,6 +1,6 @@
 # Flash Store Bot - Documentação Completa
 
-> **Versão 2.0** - Refatorado e otimizado! 🎉
+> **Versão 2.1** - Refatorado e otimizado! 🎉
 
 ## 🎯 Início Rápido
 
@@ -51,7 +51,7 @@ npm start
 
 ---
 
-## 🌟 O Que Mudou (v2.0)
+## 🌟 O Que Mudou (v2.1)
 
 ✅ **Configuração centralizada** em `config.js`  
 ✅ **Código consolidado** - 230 linhas removidas  
@@ -220,6 +220,6 @@ Para mais informações, consulte:
 
 ---
 
-**Versão:** 2.0.0
-**Última atualização:** 16 de Junho de 2026
+**Versão:** 2.1.0
+**Última atualização:** 17 de Junho de 2026
 **Status:** ✅ Produção
