@@ -893,6 +893,7 @@ html, body {
     border: 1px solid var(--danger);
 }
 
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar {
     width: 8px;

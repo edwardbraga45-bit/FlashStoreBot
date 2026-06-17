@@ -113,7 +113,7 @@ function getStatsFromDB(db) {
     const totalSales = (db.sales || []).length;
     const customers = new Set((db.sales || []).map(s => s.clienteId)).size;
     const totalTickets = (db.tickets || []).length;
-    const openTickets = (db.tickets || []).filter(ticket => ticket.status === 'aberto').length;
+    const openTickets = (db.tickets || []).filter(ticket => ['aberto', 'em_andamento'].includes(ticket.status)).length;
     const inStockItems = Object.values(db.stock || {}).filter(item => Number(item.quantidade || 0) > 0).length;
     const lowStockCount = Object.values(db.stock || {}).filter(item => Number(item.quantidade || 0) > 0 && Number(item.quantidade || 0) <= 5).length;
 
@@ -247,14 +247,26 @@ app.get('/api/status', (req, res) => {
 });
 // Stats Gerais
 app.get('/api/stats', (req, res) => {
-    const db = loadDatabase();
-    res.json(getStatsFromDB(db));
+    try {
+        const db = loadDatabase();
+        const stats = getStatsFromDB(db);
+        console.log('[API] Stats sendo retornados:', { 
+            botEnabled: stats.botEnabled, 
+            botRunning: stats.botRunning,
+            totalSales: stats.totalSales,
+            totalCustomers: stats.totalCustomers
+        });
+        res.json(stats);
+    } catch (error) {
+        console.error('[API] Erro ao calcular stats:', error);
+        res.status(500).json({ error: 'Erro ao calcular stats' });
+    }
 });
 
 // Vendas
 app.get('/api/vendas', (req, res) => {
     const db = loadDatabase();
-    const vendas = db.sales.slice(-50).reverse();
+    const vendas = (db.sales || []).slice(-50).reverse();
     
     res.json(vendas);
 });
@@ -371,7 +383,7 @@ app.get('/api/clientes', (req, res) => {
     // Agrupa vendas por cliente
     const clientesMap = {};
     
-    db.sales.forEach(sale => {
+    (db.sales || []).forEach(sale => {
         const clientId = sale.clienteId || sale.cliente;
         
         if (!clientesMap[clientId]) {

@@ -8,7 +8,7 @@
 - ✅ Ajustes de cache-busting e IDs para que o frontend carregue mudanças atualizadas
 - ✅ Validação de fluxo de tickets no painel com ticket de teste exibido corretamente
 
-## [2.0.0] - 2026-06-16 🎉 Refatoração Completa
+## [2.1.0] - 2026-06-17 🎉 Versão 2.1 Estável
 
 ### ✨ Novos Arquivos
 - **`config.js`** - Configuração centralizada de IDs, roles, canais e timeouts
@@ -99,7 +99,7 @@
 
 ## 🚀 Próximas Versões (Planejado)
 
-### v2.1 (Próxima)
+### v2.1
 - [ ] Separar comandos em módulos por tipo
 - [ ] Adicionar sistema de cache
 - [ ] Rate limiting de usuários

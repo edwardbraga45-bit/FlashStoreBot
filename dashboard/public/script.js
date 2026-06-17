@@ -10,18 +10,27 @@ let wsConnection = null;
 let currentPage = 'dashboard';
 
 function initDashboard() {
+    console.log('[Dashboard] initDashboard chamado');
     setupEventListeners();
     updateTime();
     switchPage(currentPage);
+    
+    // Carrega dashboard imediatamente
     loadDashboard();
     checkBotStatus();
 
+    // Tenta novamente em 1 segundo (fallback para atraso de carregamento)
+    setTimeout(() => {
+        console.log('Recarregando dashboard (fallback)...');
+        loadDashboard();
+    }, 1000);
+
     if (window.connectWS) {
-        wsConnection = connectWS(handleWSMessageRouter);
+        wsConnection = window.connectWS(handleWSMessageRouter);
     }
 
     setInterval(updateTime, 1000);
-    setInterval(loadDashboard, 30000);
+    setInterval(loadDashboard, 5000); // Mudou de 30s para 5s para atualização mais rápida
     setInterval(() => {
         if (currentPage === 'estoque') loadEstoque();
         if (currentPage === 'tickets') loadTickets();
@@ -135,16 +144,21 @@ function updateTime() {
 function updateBotStatusIndicator(enabled, online = true) {
     const indicator = document.querySelector('.status-indicator');
     const label = document.getElementById('botStatus');
-    if (!indicator || !label) return;
+    
+    if (!indicator || !label) {
+        console.warn('Bot status indicator elements not found');
+        return;
+    }
 
     indicator.classList.remove('online', 'disabled', 'offline');
-    if (!online) {
+    
+    if (online === false) {
         indicator.classList.add('offline');
         label.textContent = 'Painel Offline';
         return;
     }
 
-    if (enabled) {
+    if (enabled === true) {
         indicator.classList.add('online');
         label.textContent = 'Bot Ligado';
     } else {
@@ -161,77 +175,128 @@ async function checkBotStatus() {
 // ===== DASHBOARD =====
 async function loadDashboard() {
     try {
+        console.log(`[Dashboard] Carregando stats de: ${API_BASE}/stats`);
         const response = await fetch(`${API_BASE}/stats`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
         const data = await response.json();
+        console.log('[Dashboard] Stats recebidos:', data);
+        if (!data) {
+            console.warn('[Dashboard] Stats payload vazio');
+            return;
+        }
         applyStatsPayload(data);
     } catch (error) {
-        console.error('Erro ao carregar dashboard:', error);
+        console.error('[Dashboard] Erro ao carregar:', error);
     }
 }
 
 function applyStatsPayload(stats) {
-    if (!stats) return;
-    document.getElementById('receita').textContent = formatCurrency(stats.totalRevenue);
-    document.getElementById('totalVendas').textContent = stats.totalSales;
-    document.getElementById('totalClientes').textContent = stats.totalCustomers;
-    document.getElementById('lucroTotal').textContent = formatCurrency(stats.totalProfit);
-    document.getElementById('openTickets').textContent = stats.openTickets ?? 0;
-    document.getElementById('stockItems').textContent = stats.inStockItems ?? 0;
+    console.log('[ApplyStats] Iniciando com stats:', stats);
+    
+    if (!stats) {
+        console.warn('[ApplyStats] Stats payload nulo');
+        return;
+    }
+    
+    // Aplica stats gerais com validação
+    const receita = document.getElementById('receita');
+    if (receita) receita.textContent = formatCurrency(stats.totalRevenue);
+    
+    const totalVendas = document.getElementById('totalVendas');
+    if (totalVendas) totalVendas.textContent = stats.totalSales;
+    
+    const totalClientes = document.getElementById('totalClientes');
+    if (totalClientes) totalClientes.textContent = stats.totalCustomers;
+    
+    const lucroTotal = document.getElementById('lucroTotal');
+    if (lucroTotal) lucroTotal.textContent = formatCurrency(stats.totalProfit);
+    
+    const openTickets = document.getElementById('openTickets');
+    if (openTickets) openTickets.textContent = stats.openTickets ?? 0;
+    
+    const stockItems = document.getElementById('stockItems');
+    if (stockItems) stockItems.textContent = stats.inStockItems ?? 0;
+    
     const lowStockCountEl = document.getElementById('lowStockCount');
     if (lowStockCountEl) lowStockCountEl.textContent = stats.lowStockCount ?? 0;
+    
     const openTicketsMiniEl = document.getElementById('openTicketsMini');
     if (openTicketsMiniEl) openTicketsMiniEl.textContent = stats.openTickets ?? 0;
 
+    // Meta
     const salesGoal = stats.monthlySalesGoal || 1;
     const metaPercent = stats.monthlySalesGoal ? Math.min(Math.round((stats.currentSales / salesGoal) * 100), 100) : 0;
-    document.getElementById('metaProgress').style.width = `${metaPercent}%`;
-    document.getElementById('metaText').textContent = `${stats.currentSales} / ${salesGoal} vendas`;
-    document.getElementById('metaPercent').textContent = `${metaPercent}%`;
+    
+    const metaProgress = document.getElementById('metaProgress');
+    if (metaProgress) metaProgress.style.width = `${metaPercent}%`;
+    
+    const metaText = document.getElementById('metaText');
+    if (metaText) metaText.textContent = `${stats.currentSales} / ${salesGoal} vendas`;
+    
+    const metaPercent_ = document.getElementById('metaPercent');
+    if (metaPercent_) metaPercent_.textContent = `${metaPercent}%`;
+    
     const metaPercentMini = document.getElementById('metaPercentMini');
     if (metaPercentMini) metaPercentMini.textContent = `${metaPercent}%`;
 
-    const botStatus = stats.botEnabled ? 'Ligado' : 'Desligado';
-    const processStatus = stats.botRunning ? 'Processo ativo' : 'Processo parado';
+    // Bot Status - com logging
+    console.log('[ApplyStats] Bot stats:', { botEnabled: stats.botEnabled, botRunning: stats.botRunning });
+    
+    const botStatus = (stats.botEnabled === true) ? 'Ligado' : 'Desligado';
+    const processStatus = (stats.botRunning === true) ? 'Processo ativo' : 'Processo parado';
+    
+    console.log('[ApplyStats] Bot status será:', { botStatus, processStatus });
 
     const toggleButton = document.getElementById('botToggleButton');
-    const botProcessButton = document.getElementById('botProcessToggleButton');
-    const toggleStatus = document.getElementById('heroBotToggleStatus') || document.getElementById('botToggleStatus');
-    const processStatusLabel = document.getElementById('heroBotProcessStatus') || document.getElementById('botProcessStatus');
-
-    if (toggleStatus) toggleStatus.textContent = botStatus;
-    if (processStatusLabel) processStatusLabel.textContent = `Execução: ${processStatus}`;
-
+    console.log('[ApplyStats] botToggleButton encontrado?', !!toggleButton);
     if (toggleButton) {
         toggleButton.textContent = stats.botEnabled ? 'Desligar Bot' : 'Ligar Bot';
         toggleButton.disabled = false;
     }
 
+    const botProcessButton = document.getElementById('botProcessToggleButton');
+    console.log('[ApplyStats] botProcessToggleButton encontrado?', !!botProcessButton);
     if (botProcessButton) {
         botProcessButton.textContent = stats.botRunning ? 'Parar Processo' : 'Iniciar Processo';
         botProcessButton.disabled = false;
     }
+    
+    const toggleStatus = document.getElementById('heroBotToggleStatus');
+    const summaryToggleStatus = document.getElementById('summaryBotToggleStatus');
+    console.log('[ApplyStats] heroBotToggleStatus encontrado?', !!toggleStatus, 'summary?', !!summaryToggleStatus, 'Atualizando para:', botStatus);
+    if (toggleStatus) toggleStatus.textContent = botStatus;
+    if (summaryToggleStatus) summaryToggleStatus.textContent = botStatus;
+    
+    const processStatusLabel = document.getElementById('heroBotProcessStatus');
+    const summaryProcessStatusLabel = document.getElementById('summaryBotProcessStatus');
+    console.log('[ApplyStats] heroBotProcessStatus encontrado?', !!processStatusLabel, 'summary?', !!summaryProcessStatusLabel, 'Atualizando para:', `Execução: ${processStatus}`);
+    if (processStatusLabel) processStatusLabel.textContent = `Execução: ${processStatus}`;
+    if (summaryProcessStatusLabel) summaryProcessStatusLabel.textContent = `Execução: ${processStatus}`;
 
-    // update sidebar indicator with bot enabled + running state
+    // Sidebar indicator
     updateBotStatusIndicator(stats.botEnabled, stats.botRunning);
 
-    // ensure sidebar label matches bot enabled state (avoid mismatches)
-    try {
-        const sidebarIndicator = document.querySelector('.status-indicator');
-        const sidebarLabel = document.getElementById('botStatus');
-        if (sidebarIndicator && sidebarLabel) {
-            sidebarIndicator.classList.remove('online', 'disabled', 'offline');
-            if (stats.botEnabled) {
-                sidebarIndicator.classList.add('online');
-                sidebarLabel.textContent = 'Bot Ligado';
-            } else {
-                sidebarIndicator.classList.add('disabled');
-                sidebarLabel.textContent = 'Bot Desligado';
-            }
+    // Sidebar label
+    const sidebarLabel = document.getElementById('botStatus');
+    console.log('[ApplyStats] Sidebar botStatus encontrado?', !!sidebarLabel, 'Atualizando para:', botStatus);
+    if (sidebarLabel) {
+        sidebarLabel.textContent = botStatus;
+    }
+    
+    const sidebarIndicator = document.querySelector('.status-indicator');
+    console.log('[ApplyStats] Sidebar .status-indicator encontrado?', !!sidebarIndicator);
+    if (sidebarIndicator) {
+        sidebarIndicator.classList.remove('online', 'disabled', 'offline');
+        if (stats.botEnabled === true) {
+            sidebarIndicator.classList.add('online');
+        } else {
+            sidebarIndicator.classList.add('disabled');
         }
-    } catch (e) {
-        // noop
     }
 
+    // Charts
     if (stats.dailySales) updateVendidosChart(stats.dailySales);
     if (stats.topProducts) updateProdutosChart(stats.topProducts);
 }
@@ -399,7 +464,7 @@ function updateEstoqueTable(estoque) {
         soldCell.textContent = item.vendido || 0;
 
         const priceCell = document.createElement('td');
-        priceCell.innerHTML = formatCurrency(item.preco);
+        priceCell.textContent = formatCurrency(item.preco);
 
         const statusCell = document.createElement('td');
         statusCell.innerHTML = status;
@@ -476,7 +541,7 @@ function updateTicketsTable(tickets) {
         return;
     }
     tickets.forEach(ticket => {
-        const statusBadge = `<span class="badge badge-${getStatusColor(ticket.status)}">${ticket.status || 'aberto'}</span>`;
+        const statusBadge = `<span class="badge badge-${getStatusColor(ticket.status)}">${(ticket.status || 'aberto').toUpperCase()}</span>`;
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>#${ticket.id || '-'}</td>
@@ -639,6 +704,7 @@ function formatDate(value) {
 function getStatusColor(status) {
     const colors = {
         aberto: 'warning',
+        em_andamento: 'warning',
         'em-progresso': 'warning',
         fechado: 'success',
         cancelado: 'danger'

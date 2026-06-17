@@ -50,7 +50,7 @@
     },
     "nitro trimensal": {
       "nome": "Nitro Trimensal",
-      "quantidade": 0,
+      "quantidade": 5,
       "vendido": 0,
       "preco": 3.1
     }
@@ -58,6 +58,223 @@
   "sales": [],
   "coupons": [],
   "tickets": [
+    {
+      "id": "1516942140058632245",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "mensal | 2x 1mpulso",
+        "produtoNome": "Mensal | 2x 1MPULSO",
+        "quantidade": 1,
+        "valor": 2.5
+      },
+      "criadoEm": "2026-06-17T23:06:26.900Z"
+    },
+    {
+      "id": "1516942047687348234",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "nitro trimensal",
+        "produtoNome": "Nitro Trimensal",
+        "quantidade": 1,
+        "valor": 3.1
+      },
+      "criadoEm": "2026-06-17T23:06:04.899Z"
+    },
+    {
+      "id": "1516829413285691422",
+      "canal": "receber-1353153689644302468",
+      "cliente": "resenhadynha",
+      "clienteId": "1353153689644302468",
+      "status": "aberto",
+      "responsavel": null,
+      "tipo": "receber_produto",
+      "criadoEm": "2026-06-17T15:38:31.484Z"
+    },
+    {
+      "id": "1516829297250271468",
+      "canal": "receber-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "fechado",
+      "responsavel": null,
+      "tipo": "receber_produto",
+      "criadoEm": "2026-06-17T15:38:04.056Z",
+      "fechadoPor": "masterplayer503802307032199",
+      "fechadoEm": "2026-06-17T15:38:12.778Z"
+    },
+    {
+      "id": "1516828820697513994",
+      "canal": "compra-1353153689644302468",
+      "cliente": "resenhadynha",
+      "clienteId": "1353153689644302468",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "nitro mensal",
+        "produtoNome": "Nitro Mensal",
+        "quantidade": 1,
+        "valor": 2.2
+      },
+      "criadoEm": "2026-06-17T15:36:10.059Z"
+    },
+    {
+      "id": "1516828700987883691",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "nitro mensal",
+        "produtoNome": "Nitro Mensal",
+        "quantidade": 1,
+        "valor": 2.2
+      },
+      "criadoEm": "2026-06-17T15:35:41.510Z"
+    },
+    {
+      "id": "1516828647611433001",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "mensal | 14x 1mpulso",
+        "produtoNome": "Mensal | 14x 1MPULSO",
+        "quantidade": 1,
+        "valor": 16
+      },
+      "criadoEm": "2026-06-17T15:35:28.870Z"
+    },
+    {
+      "id": "1516828607874338846",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "mensal | 8x 1mpulso",
+        "produtoNome": "Mensal | 8x 1MPULSO",
+        "quantidade": 1,
+        "valor": 10.5
+      },
+      "criadoEm": "2026-06-17T15:35:19.325Z"
+    },
+    {
+      "id": "1516828597959135332",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "mensal | 2x 1mpulso",
+        "produtoNome": "Mensal | 2x 1MPULSO",
+        "quantidade": 1,
+        "valor": 2.5
+      },
+      "criadoEm": "2026-06-17T15:35:17.115Z"
+    },
+    {
+      "id": "1516828566942122146",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "link 3 meses",
+        "produtoNome": "Link 3 Meses",
+        "quantidade": 1,
+        "valor": 7.5
+      },
+      "criadoEm": "2026-06-17T15:35:09.655Z"
+    },
+    {
+      "id": "1516828554548220004",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "nitro link",
+        "produtoNome": "Nitro Link",
+        "quantidade": 1,
+        "valor": 1
+      },
+      "criadoEm": "2026-06-17T15:35:06.654Z"
+    },
+    {
+      "id": "1516828492325457931",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "nitro trimensal",
+        "produtoNome": "Nitro Trimensal",
+        "quantidade": 1,
+        "valor": 3.1
+      },
+      "criadoEm": "2026-06-17T15:34:52.121Z"
+    },
+    {
+      "id": "1516828455474429993",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "nitro mensal",
+        "produtoNome": "Nitro Mensal",
+        "quantidade": 1,
+        "valor": 2.2
+      },
+      "criadoEm": "2026-06-17T15:34:42.975Z"
+    },
+    {
+      "id": "1516828156508504104",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "nitro mensal",
+        "produtoNome": "Nitro Mensal",
+        "quantidade": 1,
+        "valor": 2.2
+      },
+      "criadoEm": "2026-06-17T15:33:31.853Z"
+    },
+    {
+      "id": "1516827916703629422",
+      "canal": "compra-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "aberto",
+      "responsavel": null,
+      "pedido": {
+        "produto": "nitro mensal",
+        "produtoNome": "Nitro Mensal",
+        "quantidade": 1,
+        "valor": 2.2
+      },
+      "criadoEm": "2026-06-17T15:32:34.614Z"
+    },
     {
       "id": "1516708714764304385",
       "canal": "ticket-1508973346220675162",
