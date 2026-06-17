@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0A0E27">
+    <title>⚡ Flash Store Bot - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=3">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <!-- Background animado -->
+    <div class="animated-background"></div>
+    
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">
+                    <h1>Flash Store</h1>
+                    <p>Bot Dashboard</p>
+                </div>
+            </div>
+
+            <nav class="nav">
+                <button class="nav-item active" data-page="dashboard">
+                    <span class="icon">📊</span>
+                    <span class="label">Dashboard</span>
+                </button>
+                <button class="nav-item" data-page="vendas">
+                    <span class="icon">💰</span>
+                    <span class="label">Vendas</span>
+                </button>
+                <button class="nav-item" data-page="estoque">
+                    <span class="icon">📦</span>
+                    <span class="label">Estoque</span>
+                </button>
+                <button class="nav-item" data-page="cupons">
+                    <span class="icon">🎟️</span>
+                    <span class="label">Cupons</span>
+                </button>
+                <button class="nav-item" data-page="tickets">
+                    <span class="icon">🎫</span>
+                    <span class="label">Tickets</span>
+                </button>
+                <button class="nav-item" data-page="clientes">
+                    <span class="icon">👥</span>
+                    <span class="label">Clientes</span>
+                </button>
+            </nav>
+
+            <div class="bot-status">
+                <div class="status-indicator online"></div>
+                <span id="botStatus">Conectando...</span>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <button id="sidebarToggle" class="sidebar-toggle" aria-label="Abrir menu">☰</button>
+                <div class="header-title">
+                    <h2 id="pageTitle">Dashboard</h2>
+                    <p id="pageSubtitle">Bem-vindo ao painel de controle</p>
+                </div>
+                <div class="header-info">
+                    <div class="time-widget">
+                        <span id="currentTime">00:00:00</span>
+                        <span id="currentDate">00/00/0000</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard Page -->
+                <section class="page active" id="dashboard-page">
+                    <div class="dashboard-hero">
+                        <div class="hero-card hero-summary">
+                            <div class="hero-card-title">
+                                <span>📌 Visão Geral</span>
+                                <h3>Painel Flash Store</h3>
+                            </div>
+                            <p>Analise receitas, tickets abertos e estoque em um painel moderno com informações organizadas.</p>
+                            <div class="hero-summary-grid">
+                                <div class="summary-metric">
+                                    <span>Receita</span>
+                                    <strong id="receita">R$ 0,00</strong>
+                                </div>
+                                <div class="summary-metric">
+                                    <span>Vendas</span>
+                                    <strong id="totalVendas">0</strong>
+                                </div>
+                                <div class="summary-metric">
+                                    <span>Clientes</span>
+                                    <strong id="totalClientes">0</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hero-card hero-controls">
+                            <div class="hero-card-title">
+                                <span>⚡ Controle Rápido</span>
+                                <h3>Status do Bot</h3>
+                            </div>
+                            <div class="bot-control-state">
+                                <span id="heroBotToggleStatus">Carregando...</span>
+                                <span id="heroBotProcessStatus">Carregando processo...</span>
+                            </div>
+                            <div class="bot-control-buttons">
+                                <button class="btn btn-primary" id="botToggleButton" type="button">Carregando...</button>
+                                <button class="btn btn-secondary" id="botProcessToggleButton" type="button">Carregando...</button>
+                            </div>
+                            <div class="mini-card-row">
+                                <div class="mini-card">
+                                    <span class="mini-title">Tickets abertos</span>
+                                    <strong id="openTicketsMini">0</strong>
+                                </div>
+                                <div class="mini-card">
+                                    <span class="mini-title">Estoque baixo</span>
+                                    <strong id="lowStockCount">0</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">💰</span>
+                                <span class="stat-title">Receita Total</span>
+                            </div>
+                            <div class="stat-value" id="receita">R$ 0,00</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">🛍️</span>
+                                <span class="stat-title">Total de Vendas</span>
+                            </div>
+                            <div class="stat-value" id="totalVendas">0</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">👥</span>
+                                <span class="stat-title">Clientes Únicos</span>
+                            </div>
+                            <div class="stat-value" id="totalClientes">0</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">💎</span>
+                                <span class="stat-title">Lucro Líquido</span>
+                            </div>
+                            <div class="stat-value" id="lucroTotal">R$ 0,00</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">🎫</span>
+                                <span class="stat-title">Tickets Abertos</span>
+                            </div>
+                            <div class="stat-value" id="openTickets">0</div>
+                            <div class="stat-change info">🔄 Atualizado em tempo real</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">📦</span>
+                                <span class="stat-title">Itens em Estoque</span>
+                            </div>
+                            <div class="stat-value" id="stockItems">0</div>
+                            <div class="stat-change info">🔔 Status atualizado automaticamente</div>
+                        </div>
+
+                        <div class="stat-card control-card">
+                            <div class="stat-header">
+                                <span class="stat-icon">⚡</span>
+                                <span class="stat-title">Bot</span>
+                            </div>
+                            <div class="stat-value" id="summaryBotToggleStatus">Carregando...</div>
+                            <div class="stat-note" id="summaryBotProcessStatus" style="font-size: 0.95rem; margin-top: 8px;">Carregando processo...</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="charts-row">
+                        <div class="chart-container large">
+                            <h3 class="chart-title">📈 Vendas por Dia</h3>
+                            <canvas id="vendidosChart"></canvas>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3 class="chart-title">🎯 Produtos Mais Vendidos</h3>
+                            <canvas id="produtosChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Meta Progress -->
+                    <div class="meta-container">
+                        <h3 class="section-title">🎯 Meta do Mês</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="metaProgress"></div>
+                        </div>
+                        <div class="progress-info">
+                            <span id="metaText">150 / 200 vendas</span>
+                            <span id="metaPercent">75%</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Vendas Page -->
+                <section class="page" id="vendas-page">
+                    <div class="table-container">
+                        <div class="table-controls">
+                            <input type="text" id="vendasSearch" placeholder="Pesquisar por cliente, produto ou pagamento..." />
+                        </div>
+                        <h3 class="section-title">💰 Histórico de Vendas</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Cliente</th>
+                                    <th>Produto</th>
+                                    <th>Valor</th>
+                                    <th>Lucro</th>
+                                    <th>Pagamento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vendasTable">
+                                <tr class="loading-row">
+                                    <td colspan="6">Carregando vendas...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Estoque Page -->
+                <section class="page" id="estoque-page">
+                    <div class="table-container">
+                        <div class="table-controls">
+                            <input type="text" id="estoqueSearch" placeholder="Pesquisar produto..." />
+                        </div>
+                        <h3 class="section-title">📦 Controle de Estoque</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Quantidade</th>
+                                    <th>Vendidos</th>
+                                    <th>Preço</th>
+                                    <th>Status</th>
+                                    <th>Ajuste</th>
+                                </tr>
+                            </thead>
+                            <tbody id="estoqueTable">
+                                <tr class="loading-row">
+                                    <td colspan="6">Carregando estoque...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Cupons Page -->
+                <section class="page" id="cupons-page">
+                    <div class="table-container">
+                        <h3 class="section-title">🎟️ Cupons de Desconto</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Cupom</th>
+                                    <th>Desconto</th>
+                                    <th>Validade</th>
+                                    <th>Usos Restantes</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cupomsTable">
+                                <tr class="loading-row">
+                                    <td colspan="5">Carregando cupons...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Tickets Page -->
+                <section class="page" id="tickets-page">
+                    <div class="table-container">
+                        <h3 class="section-title">🎫 Tickets de Atendimento</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Cliente</th>
+                                    <th>Status</th>
+                                    <th>Criado em</th>
+                                    <th>Responsável</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticketsTable">
+                                <tr class="loading-row">
+                                    <td colspan="5">Carregando tickets...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Clientes Page -->
+                <section class="page" id="clientes-page">
+                    <div class="table-container">
+                        <h3 class="section-title">👥 Top Clientes</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Posição</th>
+                                    <th>Cliente</th>
+                                    <th>Nível</th>
+                                    <th>Compras</th>
+                                    <th>Gasto Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientesTable">
+                                <tr class="loading-row">
+                                    <td colspan="5">Carregando clientes...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="ws-client.js?v=3"></script>
+    <script src="script.js?v=3"></script>
+    <footer class="app-footer">© Flash Store • Painel de Monitoramento</footer>
+</body>
+</html>

@@ -1,0 +1,126 @@
+{
+  "stock": {
+    "nitro mensal": {
+      "nome": "Nitro Mensal",
+      "quantidade": 16,
+      "vendido": 0,
+      "preco": 2.2
+    },
+    "nitro trimestral": {
+      "nome": "Nitro Trimestral",
+      "quantidade": 5,
+      "vendido": 0,
+      "preco": 3.1
+    },
+    "nitro anual": {
+      "nome": "Nitro Anual",
+      "quantidade": 7,
+      "vendido": 0,
+      "preco": 30
+    },
+    "nitro link": {
+      "nome": "Nitro Link",
+      "quantidade": 5,
+      "vendido": 0,
+      "preco": 1
+    },
+    "link 3 meses": {
+      "nome": "Link 3 Meses",
+      "quantidade": 5,
+      "vendido": 0,
+      "preco": 7.5
+    },
+    "mensal | 2x 1mpulso": {
+      "nome": "Mensal | 2x 1MPULSO",
+      "quantidade": 5,
+      "vendido": 0,
+      "preco": 2.5
+    },
+    "mensal | 8x 1mpulso": {
+      "nome": "Mensal | 8x 1MPULSO",
+      "quantidade": 5,
+      "vendido": 0,
+      "preco": 10.5
+    },
+    "mensal | 14x 1mpulso": {
+      "nome": "Mensal | 14x 1MPULSO",
+      "quantidade": 5,
+      "vendido": 0,
+      "preco": 16
+    },
+    "nitro trimensal": {
+      "nome": "Nitro Trimensal",
+      "quantidade": 0,
+      "vendido": 0,
+      "preco": 3.1
+    }
+  },
+  "sales": [],
+  "coupons": [],
+  "tickets": [
+    {
+      "id": "1516708714764304385",
+      "canal": "ticket-1508973346220675162",
+      "cliente": "masterplayer503802307032199",
+      "clienteId": "1508973346220675162",
+      "status": "fechado",
+      "responsavel": null,
+      "criadoEm": "2026-06-17T07:38:55.419Z",
+      "fechadoPor": "masterplayer503802307032199",
+      "fechadoEm": "2026-06-17T07:39:09.283Z"
+    },
+    {
+      "id": "test-0001",
+      "canal": "ticket-test-0001",
+      "cliente": "tester",
+      "clienteId": "999999999999999999",
+      "status": "aberto",
+      "responsavel": null,
+      "criadoEm": "2026-06-17T04:13:00.000Z",
+      "fechadoPor": null,
+      "fechadoEm": null
+    }
+  ],
+  "ratings": [
+    {
+      "userId": "1220004529462841376",
+      "userName": "tz_2k26",
+      "rating": 5,
+      "comment": "",
+      "date": "2026-06-16T06:52:09.631Z"
+    },
+    {
+      "userId": "1220004529462841376",
+      "userName": "tz_2k26",
+      "rating": 5,
+      "comment": "",
+      "date": "2026-06-16T06:55:59.547Z"
+    }
+  ],
+  "spam_warnings": {},
+  "reminders": [],
+  "ticket_stats": {},
+  "customer_levels": {
+    "1508973346220675162": {
+      "userId": "1508973346220675162",
+      "userName": "masterplayer503802307032199",
+      "level": "Novato",
+      "purchases": 0,
+      "lastUpdated": "2026-06-16T06:59:22.499Z"
+    }
+  },
+  "monthly_stats": {
+    "2026-5": {
+      "month": 5,
+      "year": 2026,
+      "goal": 14,
+      "sales": 0,
+      "revenue": 0,
+      "createdAt": "2026-06-16T06:56:57.331Z"
+    }
+  },
+  "settings": {
+    "bot_enabled": true,
+    "low_stock_threshold": 5
+  }
+}
