@@ -570,24 +570,24 @@ client.on(Events.InteractionCreate, async interaction => {
         }
 
         if (interaction.isChatInputCommand()) {
+            if (interaction.commandName === 'health') {
+                const uptime = process.uptime();
+                const memory = process.memoryUsage();
+                const dbStatus = (db && Object.keys(db).length > 0) ? 'loaded' : 'empty';
+
+                const healthEmbed = new EmbedBuilder()
+                    .setColor('#22C55E')
+                    .setTitle('🩺 Health — Flash Store Bot')
+                    .addFields(
+                        { name: 'Uptime', value: `${Math.floor(uptime)}s`, inline: true },
+                        { name: 'Memory (RSS)', value: `${Math.round(memory.rss / 1024 / 1024)} MB`, inline: true },
+                        { name: 'DB', value: dbStatus, inline: true }
+                    )
+                    .setTimestamp();
+
+                return interaction.reply({ embeds: [healthEmbed], ephemeral: true });
+            }
             if (interaction.commandName === 'painel') {
-                            if (interaction.commandName === 'health') {
-                                const uptime = process.uptime();
-                                const memory = process.memoryUsage();
-                                const dbStatus = (db && Object.keys(db).length > 0) ? 'loaded' : 'empty';
-
-                                const healthEmbed = new EmbedBuilder()
-                                    .setColor('#22C55E')
-                                    .setTitle('🩺 Health — Flash Store Bot')
-                                    .addFields(
-                                        { name: 'Uptime', value: `${Math.floor(uptime)}s`, inline: true },
-                                        { name: 'Memory (RSS)', value: `${Math.round(memory.rss / 1024 / 1024)} MB`, inline: true },
-                                        { name: 'DB', value: dbStatus, inline: true }
-                                    )
-                                    .setTimestamp();
-
-                                return interaction.reply({ embeds: [healthEmbed], ephemeral: true });
-                            }
                 const tipoMenu = new ActionRowBuilder().addComponents(
                     new StringSelectMenuBuilder()
                         .setCustomId('tipo_ticket')
