@@ -122,14 +122,20 @@ async function run() {
   try {
     const vendaCmd = require('../commands/venda');
     const produto = 'Nitro Trimensal';
-    // ensure stock
+    // ensure stock at a known baseline
     const key = utils.normalizeName(produto);
     if (!db.stock[key]) db.stock[key] = { nome: produto, quantidade: 5, vendido: 0, preco: 3.1 };
-    else db.stock[key].quantidade = Math.max(db.stock[key].quantidade, 5);
+    else db.stock[key].quantidade = 5;
 
-    const mi = new MockInteraction('venda', { sub: 'registrar', cliente: '<@12345>', produto, valor: 10.0, custo: 2.0, pagamento: 'pix', quantidade: 2 });
+    const before = db.stock[key].quantidade;
+    const quantidadeVenda = 2;
+    const mi = new MockInteraction('venda', { sub: 'registrar', cliente: '<@12345>', produto, valor: 10.0, custo: 2.0, pagamento: 'pix', quantidade: quantidadeVenda });
     await vendaCmd.execute(mi, ctx);
-    if (db.stock[key].quantidade <= 3 && db.sales.find(s => s.produto === produto)) console.log('venda.registrar: OK'); else console.error('venda.registrar: FAIL', db.stock[key]);
+    if (db.stock[key].quantidade === before - quantidadeVenda && db.sales.find(s => s.produto === produto)) {
+      console.log('venda.registrar: OK');
+    } else {
+      console.error('venda.registrar: FAIL', { before, after: db.stock[key].quantidade, sold: db.stock[key].vendido, saleExists: !!db.sales.find(s => s.produto === produto) });
+    }
   } catch (err) { console.error('venda.registrar: FAIL', err); }
 
   console.log('Tests finished. Check logs/test-audit.log and data.json (not modified by tests).');
